@@ -34,9 +34,9 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="h-screen flex bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col hidden md:flex border-r border-gray-100">
+      <aside className="w-64 bg-white shadow-lg flex-col hidden md:flex border-r border-gray-100 h-screen sticky top-0">
         {/* Logo */}
         <div className="p-5 border-b border-gray-100">
           <NavLink to="/">
@@ -88,11 +88,21 @@ export default function AdminLayout({ children }) {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white shadow-sm px-6 py-4 flex items-center justify-between border-b border-gray-100">
-          <div></div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 hidden md:block">{user?.name}</span>
+          {/* Mobile: logo + nav icons */}
+          <NavLink to="/"><img src="https://i.ibb.co.com/MDd996gn/logo-1-removebg-preview.png" alt="MatchNest" className="h-14 w-auto md:hidden" /></NavLink>
+          <div className="flex gap-1 md:hidden">
+            {navItems.map((item) => (
+              <NavLink key={item.path} to={item.path} end={item.path === "/admin"}
+                className={({ isActive }) => `p-2 rounded-lg ${isActive ? "bg-orange-500 text-white" : "text-gray-500"}`}>
+                <item.icon className="w-5 h-5" />
+              </NavLink>
+            ))}
+          </div>
+          {/* Desktop right */}
+          <div className="hidden md:flex items-center gap-3 ml-auto">
+            <span className="text-sm text-gray-500">{user?.name}</span>
             <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-sm overflow-hidden">
               {user?.profilePhoto?.url
                 ? <img src={user.profilePhoto.url} alt="" className="w-full h-full object-cover" />

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { searchProfiles } from "../api/search.api";
 import cyclingImg from "../assets/images/site/cycling.jpg";
-import { HiOutlineLocationMarker, HiOutlineBriefcase, HiOutlineLockClosed } from "react-icons/hi";
+import { HiOutlineLocationMarker, HiOutlineBriefcase, HiOutlineLockClosed, HiOutlineHeart } from "react-icons/hi";
 
 const GuestView = () => {
   const navigate = useNavigate();
@@ -166,18 +166,18 @@ export default function MatchesAwait() {
 
   if (!user) return <GuestView />;
 
-  // If user hasn't set gender yet, prompt them
-  if (!user.gender) {
+  // Deactivated account
+  if (user?.isActive === false) {
     return (
-      <div className="py-8 mt-16 w-11/12 mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <div className="bg-white rounded-2xl shadow p-10 max-w-md w-full">
-          <p className="text-4xl mb-4">👤</p>
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">Set Your Gender First</h2>
-          <p className="text-gray-500 mb-6">To see your matches, please complete your profile and select your gender.</p>
-          <button onClick={() => navigate("/profile")}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3 rounded-xl transition">
-            Complete Profile
-          </button>
+      <div className="py-8 mt-16 w-11/12 mx-auto flex items-center justify-center min-h-[60vh]">
+        <div className="bg-white rounded-2xl shadow p-10 max-w-md w-full text-center border border-red-100">
+          <p className="text-3xl mb-3">🚫</p>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Account Suspended</h2>
+          <p className="text-gray-500 text-sm mb-5">Your account has been deactivated. You cannot browse matches at this time. Please contact our support team to resolve this.</p>
+          <a href="mailto:support@matchnest.com"
+            className="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2.5 rounded-xl transition">
+            Contact Support
+          </a>
         </div>
       </div>
     );
@@ -185,6 +185,7 @@ export default function MatchesAwait() {
 
   return (
     <div className="py-8 mt-16 w-11/12 mx-auto">
+      {/* No gender banner — removed, blur overlay handles this */}
       {/* Toast */}
       {toast && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-white border border-orange-200 shadow-xl rounded-2xl px-6 py-4 flex items-center gap-4 min-w-[320px]">
@@ -210,76 +211,99 @@ export default function MatchesAwait() {
         <p className="text-gray-500 text-lg">Discover people who could be your perfect match.</p>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white rounded-2xl shadow p-5 mb-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Min Age</label>
-          <input type="number" placeholder="18" min="18" max="80" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
-            value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Max Age</label>
-          <input type="number" placeholder="60" min="18" max="80" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
-            value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Gender</label>
-          <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800" value={filters.gender}
-            onChange={(e) => setFilters({ ...filters, gender: e.target.value })}>
-            <option value="">Any</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Religion</label>
-          <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800" value={filters.religion}
-            onChange={(e) => setFilters({ ...filters, religion: e.target.value })}>
-            <option value="">Any</option>
-            <option value="islam">Islam</option>
-            <option value="hinduism">Hinduism</option>
-            <option value="christianity">Christianity</option>
-            <option value="buddhism">Buddhism</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">City / Area</label>
-          <input type="text" placeholder="e.g. Dhaka" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
-            value={filters.city} onChange={(e) => setFilters({ ...filters, city: e.target.value })} />
-        </div>
-        <div className="flex gap-2">
-          <button onClick={handleApply} className="w-full bg-orange-500 text-white hover:bg-orange-600 text-sm font-semibold px-3 py-2 rounded-xl transition">Filter</button>
-          <button onClick={handleReset} className="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold px-3 py-2 rounded-xl transition">Reset</button>
+      {/* Filter + Profiles — wrapped for overlay */}
+      <div className="relative">
+
+        {/* Overlay when gender not set */}
+        {!user.gender && (
+          <div className="absolute inset-0 z-10 flex items-start justify-center pt-16 pointer-events-none">
+            <div className="pointer-events-auto bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl px-10 py-8 text-center max-w-sm mx-4 border border-orange-100">
+              <HiOutlineHeart className="w-12 h-12 text-orange-400 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Your matches are waiting</h3>
+              <p className="text-gray-500 text-sm mb-5">Complete your profile and set your gender to unlock all matches and filters.</p>
+              <button onClick={() => navigate("/profile")}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded-xl transition w-full">
+                Complete Profile
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Blurred content when no gender */}
+        <div className={!user.gender ? "blur-sm pointer-events-none select-none" : ""}>
+
+          {/* Filter Bar */}
+          <div className="bg-white rounded-2xl shadow p-5 mb-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Min Age</label>
+              <input type="number" placeholder="18" min="18" max="80" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
+                value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Max Age</label>
+              <input type="number" placeholder="60" min="18" max="80" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
+                value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Gender</label>
+              <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800" value={filters.gender}
+                onChange={(e) => setFilters({ ...filters, gender: e.target.value })}>
+                <option value="">Any</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Religion</label>
+              <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800" value={filters.religion}
+                onChange={(e) => setFilters({ ...filters, religion: e.target.value })}>
+                <option value="">Any</option>
+                <option value="islam">Islam</option>
+                <option value="hinduism">Hinduism</option>
+                <option value="christianity">Christianity</option>
+                <option value="buddhism">Buddhism</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">City / Area</label>
+              <input type="text" placeholder="e.g. Dhaka" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
+                value={filters.city} onChange={(e) => setFilters({ ...filters, city: e.target.value })} />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleApply} className="w-full bg-orange-500 text-white hover:bg-orange-600 text-sm font-semibold px-3 py-2 rounded-xl transition">Filter</button>
+              <button onClick={handleReset} className="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold px-3 py-2 rounded-xl transition">Reset</button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <span className="loading loading-spinner loading-lg text-orange-500" />
+            </div>
+          ) : profiles.length === 0 ? (
+            <p className="text-center text-gray-400 py-16">No profiles found.</p>
+          ) : (
+            <>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {profiles.map((p) => <ProfileCard key={p._id} user={p} onViewProfile={handleViewProfile} />)}
+              </div>
+              <div className="flex justify-center items-center gap-2 mt-10">
+                <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}
+                  className="text-sm border border-gray-200 px-4 py-2 rounded-xl hover:border-orange-400 hover:text-orange-500 transition disabled:opacity-40 bg-white text-gray-600">← Prev</button>
+                {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pg) => (
+                  <button key={pg} onClick={() => handlePageChange(pg)}
+                    className={`text-sm px-4 py-2 rounded-xl transition ${pg === page ? "bg-orange-500 text-white" : "border border-gray-200 bg-white text-gray-600 hover:border-orange-400 hover:text-orange-500"}`}>
+                    {pg}
+                  </button>
+                ))}
+                <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages || totalPages <= 1}
+                  className="text-sm border border-gray-200 px-4 py-2 rounded-xl hover:border-orange-400 hover:text-orange-500 transition disabled:opacity-40 bg-white text-gray-600">Next →</button>
+              </div>
+            </>
+          )}
         </div>
       </div>
-
-      {loading ? (
-        <div className="flex justify-center py-16">
-          <span className="loading loading-spinner loading-lg text-orange-500" />
-        </div>
-      ) : profiles.length === 0 ? (
-        <p className="text-center text-gray-400 py-16">No profiles found.</p>
-      ) : (
-        <>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {profiles.map((p) => <ProfileCard key={p._id} user={p} onViewProfile={handleViewProfile} />)}
-          </div>
-          <div className="flex justify-center items-center gap-2 mt-10">
-            <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}
-              className="text-sm border border-gray-200 px-4 py-2 rounded-xl hover:border-orange-400 hover:text-orange-500 transition disabled:opacity-40 bg-white text-gray-600">← Prev</button>
-            {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pg) => (
-              <button key={pg} onClick={() => handlePageChange(pg)}
-                className={`text-sm px-4 py-2 rounded-xl transition ${pg === page ? "bg-orange-500 text-white" : "border border-gray-200 bg-white text-gray-600 hover:border-orange-400 hover:text-orange-500"}`}>
-                {pg}
-              </button>
-            ))}
-            <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages || totalPages <= 1}
-              className="text-sm border border-gray-200 px-4 py-2 rounded-xl hover:border-orange-400 hover:text-orange-500 transition disabled:opacity-40 bg-white text-gray-600">Next →</button>
-          </div>
-        </>
-      )}
     </div>
   );
 }

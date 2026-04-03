@@ -35,9 +35,9 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="h-screen flex bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col hidden md:flex border-r border-gray-100">
+      <aside className="w-64 bg-white shadow-lg flex-col hidden md:flex border-r border-gray-100 h-screen sticky top-0">
         {/* Logo */}
         <div className="p-5 border-b border-gray-100">
           <NavLink to="/">
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-6 overflow-y-auto h-full">
           {children}
         </main>
       </div>

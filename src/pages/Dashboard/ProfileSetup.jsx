@@ -11,9 +11,9 @@ const statusStyle = {
   rejected: "bg-red-100 text-red-500",
 };
 
-const inp = "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400";
+const inp = "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800";
 const SectionTitle = ({ title }) => (
-  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-6 mb-3 border-b border-gray-100 pb-2">{title}</h3>
+  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-5 mb-3 border-b border-gray-100 pb-2">{title}</h3>
 );
 
 export default function ProfileSetup() {
@@ -134,215 +134,228 @@ export default function ProfileSetup() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">My Profile</h2>
-          {profileStatus && (
-            <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${statusStyle[profileStatus] || "bg-gray-100 text-gray-500"}`}>
-              {profileStatus.replace("_", " ")}
-            </span>
-          )}
-        </div>
-
-        {message && <div className="bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-xl mb-4 text-sm">{message}</div>}
-        {error && <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl mb-4 text-sm">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Main Photo */}
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-orange-50 border-2 border-orange-300">
-              {photoPreview
-                ? <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No Photo</div>
-              }
-            </div>
-            <label className="cursor-pointer text-sm text-orange-500 hover:underline">
-              {photoUploading ? "Uploading..." : "Change Main Photo"}
-              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} disabled={photoUploading} />
-            </label>
-          </div>
-
-          {/* Additional Photos */}
-          <SectionTitle title="Additional Photos (max 5)" />
-          <div className="flex flex-wrap gap-3">
-            {photos.map((p, i) => (
-              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200">
-                <img src={p.url} alt="" className="w-full h-full object-cover" />
-                <button type="button" onClick={() => handleRemovePhoto(i)}
-                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
-                  <HiOutlineTrash className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-            {photos.length < 5 && (
-              <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-orange-400 transition">
-                {uploadingPhoto ? <span className="loading loading-spinner loading-xs" /> : <HiOutlinePlus className="w-6 h-6 text-gray-400" />}
-                <input type="file" accept="image/*" className="hidden" onChange={handleAddPhoto} disabled={uploadingPhoto} />
-              </label>
-            )}
-          </div>
-
-          {/* Basic Info */}
-          <SectionTitle title="Basic Information" />
-          <div className="grid grid-cols-2 gap-4">
-            <input name="age" type="number" placeholder="Age" className={inp} value={form.age} onChange={handleChange} />
-            <input name="phone" type="text" placeholder="Phone" className={inp} value={form.phone} onChange={handleChange} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <select name="gender" className={inp} value={form.gender} onChange={handleChange} required>
-              <option value="">Select Gender *</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-            <select name="religion" className={inp} value={form.religion} onChange={handleChange}>
-              <option value="">Select Religion</option>
-              <option value="islam">Islam</option>
-              <option value="hinduism">Hinduism</option>
-              <option value="christianity">Christianity</option>
-              <option value="buddhism">Buddhism</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <input name="profession" type="text" placeholder="Profession" className={inp} value={form.profession} onChange={handleChange} />
-            <input name="city" type="text" placeholder="City" className={inp} value={form.location.city} onChange={handleChange} />
-          </div>
-          <select name="maritalStatus" className={inp} value={form.maritalStatus} onChange={handleChange}>
-            <option value="">Marital Status</option>
-            <option value="never_married">Never Married</option>
-            <option value="divorced">Divorced</option>
-            <option value="widowed">Widowed</option>
-            <option value="other">Other</option>
-          </select>
-
-          {/* Physical */}
-          <SectionTitle title="Physical Information" />
-          <div className="grid grid-cols-3 gap-4">
-            <input name="height" placeholder="Height (e.g. 5'7&quot;)" className={inp} value={form.height} onChange={handleChange} />
-            <input name="weight" placeholder="Weight (e.g. 65 kg)" className={inp} value={form.weight} onChange={handleChange} />
-            <select name="bloodGroup" className={inp} value={form.bloodGroup} onChange={handleChange}>
-              <option value="">Blood Group</option>
-              {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map((b) => <option key={b} value={b}>{b}</option>)}
-            </select>
-          </div>
-
-          {/* Education */}
-          <SectionTitle title="Education" />
-          <select name="education" className={inp} value={form.education} onChange={handleChange}>
-            <option value="">Select Education Level</option>
-            <option value="below_ssc">Below SSC</option>
-            <option value="ssc">SSC</option>
-            <option value="hsc">HSC</option>
-            <option value="diploma">Diploma</option>
-            <option value="bachelor">Bachelor's</option>
-            <option value="master">Master's</option>
-            <option value="phd">PhD</option>
-            <option value="other">Other</option>
-          </select>
-
-          {/* Career */}
-          <SectionTitle title="Career" />
-          <div className="grid grid-cols-2 gap-4">
-            <input name="career.company" placeholder="Company / Organization" className={inp} value={form.career.company} onChange={handleChange} />
-            <select name="career.annualIncome" className={inp} value={form.career.annualIncome} onChange={handleChange}>
-              <option value="">Annual Income</option>
-              <option value="below_3L">Below 3 Lakh</option>
-              <option value="3L_5L">3 - 5 Lakh</option>
-              <option value="5L_10L">5 - 10 Lakh</option>
-              <option value="10L_20L">10 - 20 Lakh</option>
-              <option value="above_20L">Above 20 Lakh</option>
-            </select>
-          </div>
-
-          {/* Spiritual */}
-          <SectionTitle title="Spiritual / Religious Practice" />
-          <select name="spiritual.practiceLevel" className={inp} value={form.spiritual.practiceLevel} onChange={handleChange}>
-            <option value="">Select Practice Level</option>
-            <option value="practising">Practising</option>
-            <option value="moderate">Moderate</option>
-            <option value="not_practising">Not Practising</option>
-            <option value="other">Other</option>
-          </select>
-
-          {/* Hobbies */}
-          <SectionTitle title="Hobbies & Interests" />
-          <input name="hobbies" placeholder="e.g. Reading, Cooking, Travel (comma separated)" className={inp} value={form.hobbies} onChange={handleChange} />
-
-          {/* Family Background */}
-          <SectionTitle title="Family Background" />
-          <div className="grid grid-cols-2 gap-4">
-            <input name="family.fatherOccupation" placeholder="Father's Occupation" className={inp} value={form.family.fatherOccupation} onChange={handleChange} />
-            <input name="family.motherOccupation" placeholder="Mother's Occupation" className={inp} value={form.family.motherOccupation} onChange={handleChange} />
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <input name="family.siblings" type="number" placeholder="No. of Siblings" className={inp} value={form.family.siblings} onChange={handleChange} />
-            <select name="family.familyType" className={inp} value={form.family.familyType} onChange={handleChange}>
-              <option value="">Family Type</option>
-              <option value="nuclear">Nuclear</option>
-              <option value="joint">Joint</option>
-              <option value="other">Other</option>
-            </select>
-            <select name="family.familyStatus" className={inp} value={form.family.familyStatus} onChange={handleChange}>
-              <option value="">Family Status</option>
-              <option value="middle_class">Middle Class</option>
-              <option value="upper_middle_class">Upper Middle</option>
-              <option value="rich">Rich</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* Partner Preference */}
-          <SectionTitle title="Partner Preference" />
-          <div className="grid grid-cols-2 gap-4">
-            <input name="pref.minAge" type="number" placeholder="Min Age" className={inp} value={form.partnerPreference.minAge} onChange={handleChange} />
-            <input name="pref.maxAge" type="number" placeholder="Max Age" className={inp} value={form.partnerPreference.maxAge} onChange={handleChange} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <select name="pref.religion" className={inp} value={form.partnerPreference.religion} onChange={handleChange}>
-              <option value="">Any Religion</option>
-              <option value="islam">Islam</option>
-              <option value="hinduism">Hinduism</option>
-              <option value="christianity">Christianity</option>
-              <option value="buddhism">Buddhism</option>
-              <option value="other">Other</option>
-            </select>
-            <select name="pref.education" className={inp} value={form.partnerPreference.education} onChange={handleChange}>
-              <option value="">Any Education</option>
-              <option value="bachelor">Bachelor's+</option>
-              <option value="master">Master's+</option>
-              <option value="any">Any</option>
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <input name="pref.location" placeholder="Preferred Location" className={inp} value={form.partnerPreference.location} onChange={handleChange} />
-            <input name="pref.profession" placeholder="Preferred Profession" className={inp} value={form.partnerPreference.profession} onChange={handleChange} />
-          </div>
-
-          {/* Bio */}
-          <SectionTitle title="About Me" />
-          <textarea name="bio" placeholder="Bio (max 500 chars)" className={`${inp} resize-none`} rows={4} value={form.bio} onChange={handleChange} maxLength={500} />
-
-          <button type="submit" disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center mt-2">
-            {loading ? <span className="loading loading-spinner" /> : "Save Profile"}
-          </button>
-        </form>
-
-        {profileStatus !== "verified" && profileStatus !== "pending_verification" && (
-          <button onClick={() => navigate("/verify-identity")}
-            className="mt-4 w-full border border-green-400 text-green-600 hover:bg-green-50 font-semibold py-2.5 rounded-xl transition">
-            Request Verification
-          </button>
-        )}
-        {profileStatus === "pending_verification" && (
-          <p className="mt-4 text-center text-sm text-blue-500">Verification is under review.</p>
-        )}
-        {profileStatus === "verified" && (
-          <p className="mt-4 text-center text-sm text-green-600">✓ Your profile is verified.</p>
+    <div className="max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">My Profile</h2>
+        {profileStatus && (
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${statusStyle[profileStatus] || "bg-gray-100 text-gray-500"}`}>
+            {profileStatus.replace("_", " ")}
+          </span>
         )}
       </div>
+
+      {message && <div className="bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-xl mb-4 text-sm">{message}</div>}
+      {error && <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl mb-4 text-sm">{error}</div>}
+
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* ── LEFT COLUMN ── */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-2">
+
+            {/* Photo */}
+            <div className="flex flex-col items-center gap-2 mb-2">
+              <div className="w-28 h-28 rounded-full overflow-hidden bg-orange-50 border-2 border-orange-300">
+                {photoPreview
+                  ? <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  : <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No Photo</div>
+                }
+              </div>
+              <label className="cursor-pointer text-sm text-orange-500 hover:underline">
+                {photoUploading ? "Uploading..." : "Change Main Photo"}
+                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} disabled={photoUploading} />
+              </label>
+            </div>
+
+            {/* Additional Photos */}
+            <SectionTitle title="Additional Photos (max 5)" />
+            <div className="flex flex-wrap gap-3">
+              {photos.map((p, i) => (
+                <div key={i} className="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200">
+                  <img src={p.url} alt="" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => handleRemovePhoto(i)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
+                    <HiOutlineTrash className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+              {photos.length < 5 && (
+                <label className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-orange-400 transition">
+                  {uploadingPhoto ? <span className="loading loading-spinner loading-xs" /> : <HiOutlinePlus className="w-5 h-5 text-gray-400" />}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleAddPhoto} disabled={uploadingPhoto} />
+                </label>
+              )}
+            </div>
+
+            {/* Basic Info */}
+            <SectionTitle title="Basic Information" />
+            <div className="grid grid-cols-2 gap-3">
+              <input name="age" type="number" placeholder="Age" className={inp} value={form.age} onChange={handleChange} />
+              <input name="phone" type="text" placeholder="Phone" className={inp} value={form.phone} onChange={handleChange} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <select name="gender" className={inp} value={form.gender} onChange={handleChange} required>
+                <option value="">Select Gender *</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              <select name="religion" className={inp} value={form.religion} onChange={handleChange}>
+                <option value="">Select Religion</option>
+                <option value="islam">Islam</option>
+                <option value="hinduism">Hinduism</option>
+                <option value="christianity">Christianity</option>
+                <option value="buddhism">Buddhism</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <input name="profession" type="text" placeholder="Profession" className={inp} value={form.profession} onChange={handleChange} />
+              <input name="city" type="text" placeholder="City" className={inp} value={form.location.city} onChange={handleChange} />
+            </div>
+            <select name="maritalStatus" className={inp} value={form.maritalStatus} onChange={handleChange}>
+              <option value="">Marital Status</option>
+              <option value="never_married">Never Married</option>
+              <option value="divorced">Divorced</option>
+              <option value="widowed">Widowed</option>
+              <option value="other">Other</option>
+            </select>
+
+            {/* Physical */}
+            <SectionTitle title="Physical Information" />
+            <div className="grid grid-cols-3 gap-3">
+              <input name="height" placeholder="Height" className={inp} value={form.height} onChange={handleChange} />
+              <input name="weight" placeholder="Weight" className={inp} value={form.weight} onChange={handleChange} />
+              <select name="bloodGroup" className={inp} value={form.bloodGroup} onChange={handleChange}>
+                <option value="">Blood</option>
+                {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </div>
+
+            {/* Education */}
+            <SectionTitle title="Education" />
+            <select name="education" className={inp} value={form.education} onChange={handleChange}>
+              <option value="">Select Education Level</option>
+              <option value="below_ssc">Below SSC</option>
+              <option value="ssc">SSC</option>
+              <option value="hsc">HSC</option>
+              <option value="diploma">Diploma</option>
+              <option value="bachelor">Bachelor's</option>
+              <option value="master">Master's</option>
+              <option value="phd">PhD</option>
+              <option value="other">Other</option>
+            </select>
+
+            {/* About Me */}
+            <SectionTitle title="About Me" />
+            <textarea name="bio" placeholder="Bio (max 500 chars)" className={`${inp} resize-none`} rows={4} value={form.bio} onChange={handleChange} maxLength={500} />
+          </div>
+
+          {/* ── RIGHT COLUMN ── */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-2">
+
+            {/* Career */}
+            <SectionTitle title="Career" />
+            <div className="grid grid-cols-2 gap-3">
+              <input name="career.company" placeholder="Company / Organization" className={inp} value={form.career.company} onChange={handleChange} />
+              <select name="career.annualIncome" className={inp} value={form.career.annualIncome} onChange={handleChange}>
+                <option value="">Annual Income</option>
+                <option value="below_3L">Below 3 Lakh</option>
+                <option value="3L_5L">3 - 5 Lakh</option>
+                <option value="5L_10L">5 - 10 Lakh</option>
+                <option value="10L_20L">10 - 20 Lakh</option>
+                <option value="above_20L">Above 20 Lakh</option>
+              </select>
+            </div>
+
+            {/* Spiritual */}
+            <SectionTitle title="Spiritual / Religious Practice" />
+            <select name="spiritual.practiceLevel" className={inp} value={form.spiritual.practiceLevel} onChange={handleChange}>
+              <option value="">Select Practice Level</option>
+              <option value="practising">Practising</option>
+              <option value="moderate">Moderate</option>
+              <option value="not_practising">Not Practising</option>
+              <option value="other">Other</option>
+            </select>
+
+            {/* Hobbies */}
+            <SectionTitle title="Hobbies & Interests" />
+            <input name="hobbies" placeholder="e.g. Reading, Cooking, Travel (comma separated)" className={inp} value={form.hobbies} onChange={handleChange} />
+
+            {/* Family Background */}
+            <SectionTitle title="Family Background" />
+            <div className="grid grid-cols-2 gap-3">
+              <input name="family.fatherOccupation" placeholder="Father's Occupation" className={inp} value={form.family.fatherOccupation} onChange={handleChange} />
+              <input name="family.motherOccupation" placeholder="Mother's Occupation" className={inp} value={form.family.motherOccupation} onChange={handleChange} />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <input name="family.siblings" type="number" placeholder="Siblings" className={inp} value={form.family.siblings} onChange={handleChange} />
+              <select name="family.familyType" className={inp} value={form.family.familyType} onChange={handleChange}>
+                <option value="">Family Type</option>
+                <option value="nuclear">Nuclear</option>
+                <option value="joint">Joint</option>
+                <option value="other">Other</option>
+              </select>
+              <select name="family.familyStatus" className={inp} value={form.family.familyStatus} onChange={handleChange}>
+                <option value="">Status</option>
+                <option value="middle_class">Middle Class</option>
+                <option value="upper_middle_class">Upper Middle</option>
+                <option value="rich">Rich</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            {/* Partner Preference */}
+            <SectionTitle title="Partner Preference" />
+            <div className="grid grid-cols-2 gap-3">
+              <input name="pref.minAge" type="number" placeholder="Min Age" className={inp} value={form.partnerPreference.minAge} onChange={handleChange} />
+              <input name="pref.maxAge" type="number" placeholder="Max Age" className={inp} value={form.partnerPreference.maxAge} onChange={handleChange} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <select name="pref.religion" className={inp} value={form.partnerPreference.religion} onChange={handleChange}>
+                <option value="">Any Religion</option>
+                <option value="islam">Islam</option>
+                <option value="hinduism">Hinduism</option>
+                <option value="christianity">Christianity</option>
+                <option value="buddhism">Buddhism</option>
+                <option value="other">Other</option>
+              </select>
+              <select name="pref.education" className={inp} value={form.partnerPreference.education} onChange={handleChange}>
+                <option value="">Any Education</option>
+                <option value="bachelor">Bachelor's+</option>
+                <option value="master">Master's+</option>
+                <option value="any">Any</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <input name="pref.location" placeholder="Preferred Location" className={inp} value={form.partnerPreference.location} onChange={handleChange} />
+              <input name="pref.profession" placeholder="Preferred Profession" className={inp} value={form.partnerPreference.profession} onChange={handleChange} />
+            </div>
+
+            {/* Save button */}
+            <div className="mt-auto pt-4">
+              <button type="submit" disabled={loading}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center">
+                {loading ? <span className="loading loading-spinner" /> : "Save Profile"}
+              </button>
+
+              {profileStatus !== "verified" && profileStatus !== "pending_verification" && (
+                <button type="button" onClick={() => navigate("/verify-identity")}
+                  className="mt-3 w-full border border-green-400 text-green-600 hover:bg-green-50 font-semibold py-2.5 rounded-xl transition">
+                  Request Verification
+                </button>
+              )}
+              {profileStatus === "pending_verification" && (
+                <p className="mt-3 text-center text-sm text-blue-500">Verification is under review.</p>
+              )}
+              {profileStatus === "verified" && (
+                <p className="mt-3 text-center text-sm text-green-600">✓ Your profile is verified.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

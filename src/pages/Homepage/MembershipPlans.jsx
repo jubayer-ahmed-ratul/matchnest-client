@@ -52,7 +52,11 @@ const MembershipPlans = () => {
 
   const handlePlan = async (planKey) => {
     if (planKey === "free") return;
-    if (!user) { navigate("/login"); return; }
+    if (!user) {
+      localStorage.setItem("redirectAfterLogin", "/#membership");
+      navigate("/login");
+      return;
+    }
     setLoading(planKey);
     try {
       const res = await createCheckout(planKey);

@@ -3,22 +3,23 @@ import { FiShield, FiGlobe, FiUsers } from 'react-icons/fi';
 
 const Card = ({ Icon, title, description, visible, delay, fromX, fromY }) => {
     return (
-        <div
-            style={{
-                transition: 'opacity 1000ms ease-out, transform 1000ms ease-out',
-                transitionDelay: visible ? delay : '0ms',
-                opacity: visible ? 1 : 0,
-                transform: visible
-                    ? 'translateX(0) translateY(0)'
-                    : `translateX(${fromX}px) translateY(${fromY}px)`,
-            }}
-            className="
-                bg-white p-6 rounded-xl shadow-lg hover:shadow-xl 
-                border border-gray-200
-                flex flex-col items-center justify-center 
-                h-full min-h-[280px] text-center
-            "
-        >
+    <div
+    style={{
+        transition: 'opacity 1000ms ease-out, transform 1000ms ease-out',
+        transitionDelay: visible ? delay : '0ms',
+        opacity: visible ? 1 : 0,
+        transform: visible
+            ? 'translateX(0) translateY(0)'
+            : `translateX(${fromX}px) translateY(${fromY}px)`,
+    }}
+    className="
+        bg-white p-6 rounded-xl
+        shadow-lg hover:shadow-xl
+        transition-shadow duration-300
+        flex flex-col items-center justify-center 
+        h-full min-h-[280px] text-center
+    "
+>
             <Icon className="text-orange-500 text-5xl mb-4" />
             <h3 className="text-xl font-semibold text-orange-500 mb-3">
                 {title}

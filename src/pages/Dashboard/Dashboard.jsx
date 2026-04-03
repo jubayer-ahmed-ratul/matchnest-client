@@ -27,6 +27,22 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-3xl mx-auto">
+
+      {/* Deactivated account banner */}
+      {user?.isActive === false && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6 text-center">
+          <p className="text-2xl mb-2">🚫</p>
+          <h3 className="text-lg font-bold text-red-700 mb-1">Your account has been suspended</h3>
+          <p className="text-red-500 text-sm mb-4">
+            Your account is currently inactive. You cannot browse profiles, send interests, or use any features until your account is reactivated.
+          </p>
+          <a href="mailto:support@matchnest.com"
+            className="inline-block bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-5 py-2 rounded-xl transition">
+            Contact Support
+          </a>
+        </div>
+      )}
+
       <div className="card bg-white shadow p-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-xl font-semibold">Welcome back, {user?.name} 👋</h2>
