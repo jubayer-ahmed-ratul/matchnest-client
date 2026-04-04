@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProfileById } from "../api/search.api";
 import { sendInterest } from "../api/interest.api";
+import { sendChatRequest } from "../api/chat.api";
 import { useAuth } from "../context/AuthContext";
 import {
   HiOutlineCake, HiOutlineUser, HiOutlineLocationMarker,
   HiOutlineBriefcase, HiOutlineEye, HiOutlinePhone,
   HiOutlineArrowLeft, HiOutlineHeart, HiOutlineAcademicCap,
   HiOutlineHome, HiOutlineUsers, HiOutlinePhotograph, HiOutlineX,
-  HiOutlineCurrencyDollar, HiOutlineSparkles,
+  HiOutlineCurrencyDollar, HiOutlineSparkles, HiOutlineChatAlt2,
 } from "react-icons/hi";
 
 const NA = <span className="text-gray-300 italic text-sm">Not provided</span>;
@@ -38,6 +39,8 @@ export default function UserProfile() {
   const [interestError, setInterestError] = useState("");
   const [showPhotos, setShowPhotos] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [chatRequested, setChatRequested] = useState(false);
+  const [chatRequestError, setChatRequestError] = useState("");
 
   useEffect(() => {
     getProfileById(id)
@@ -180,6 +183,34 @@ export default function UserProfile() {
                 <p className="text-green-600 text-sm font-semibold text-center py-2">
                   ✓ Interest sent!
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* Chat Request card */}
+          {user && user._id?.toString() !== id && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <HiOutlineChatAlt2 className="w-4 h-4 text-orange-500" /> Chat Request
+              </h3>
+              {chatRequestError && <p className="text-red-500 text-xs mb-2">{chatRequestError}</p>}
+              {chatRequested ? (
+                <p className="text-green-600 text-sm font-semibold text-center py-2">✓ Chat request sent!</p>
+              ) : (
+                <button
+                  onClick={async () => {
+                    setChatRequestError("");
+                    try {
+                      await sendChatRequest(id);
+                      setChatRequested(true);
+                    } catch (err) {
+                      setChatRequestError(err.response?.data?.message || "Failed to send request");
+                    }
+                  }}
+                  className="w-full border border-orange-400 text-orange-500 hover:bg-orange-50 font-semibold py-2 rounded-xl transition flex items-center justify-center gap-2"
+                >
+                  <HiOutlineChatAlt2 className="w-4 h-4" /> Send Chat Request
+                </button>
               )}
             </div>
           )}
