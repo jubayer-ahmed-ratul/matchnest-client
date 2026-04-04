@@ -2,8 +2,28 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { searchProfiles } from "../api/search.api";
+import { getProfile } from "../api/profile.api";
 import cyclingImg from "../assets/images/site/cycling.jpg";
 import { HiOutlineLocationMarker, HiOutlineBriefcase, HiOutlineLockClosed, HiOutlineHeart } from "react-icons/hi";
+
+// Required fields for 70% completion
+const REQUIRED_FIELDS = [
+  (u) => u.name,
+  (u) => u.gender,
+  (u) => u.age,
+  (u) => u.religion,
+  (u) => u.profession,
+  (u) => u.location?.city,
+  (u) => u.maritalStatus,
+  (u) => u.education,
+  (u) => u.career?.annualIncome !== undefined && u.career?.annualIncome !== "",
+];
+
+const getCompletionPercent = (profile) => {
+  if (!profile) return 0;
+  const filled = REQUIRED_FIELDS.filter((fn) => fn(profile)).length;
+  return Math.round((filled / REQUIRED_FIELDS.length) * 100);
+};
 
 const GuestView = () => {
   const navigate = useNavigate();
@@ -104,7 +124,7 @@ const ProfileCard = ({ user, onViewProfile }) => (
   </div>
 );
 
-const defaultFilters = { minAge: "", maxAge: "", religion: "", city: "", gender: "" };
+const defaultFilters = { minAge: "", maxAge: "", religion: "", city: "", gender: "", verified: "" };
 
 // Returns opposite gender for auto-filtering
 const getOppositeGender = (gender) => {
@@ -122,6 +142,20 @@ export default function MatchesAwait() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [toast, setToast] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  // fetch full profile for completion check
+  useEffect(() => {
+    if (!user) { setProfileLoading(false); return; }
+    getProfile()
+      .then((res) => setProfileData(res.data.user))
+      .catch(() => {})
+      .finally(() => setProfileLoading(false));
+  }, [user]);
+
+  const completionPercent = getCompletionPercent(profileData);
+  const hasAccess = completionPercent >= 70;
 
   const handleViewProfile = (id) => {
     if (user?.profileStatus === "verified") {
@@ -146,11 +180,12 @@ export default function MatchesAwait() {
 
   useEffect(() => {
     if (!user) return;
+    if (!hasAccess) return; // don't fetch if profile incomplete
     const initialGender = getOppositeGender(user?.gender);
     const initialFilters = { ...defaultFilters, gender: initialGender };
     setFilters(initialFilters);
     fetchProfiles(initialFilters, 1);
-  }, [user]);
+  }, [user, hasAccess]);
   const handleApply = () => { setPage(1); fetchProfiles(filters, 1); };
   const handleReset = () => {
     const resetFilters = { ...defaultFilters, gender: getOppositeGender(user?.gender) };
@@ -183,6 +218,12 @@ export default function MatchesAwait() {
     );
   }
 
+  if (profileLoading) return (
+    <div className="flex justify-center items-center min-h-[60vh]">
+      <span className="loading loading-spinner loading-lg text-orange-500" />
+    </div>
+  );
+
   return (
     <div className="py-8 mt-16 w-11/12 mx-auto">
       {/* No gender banner — removed, blur overlay handles this */}
@@ -214,13 +255,17 @@ export default function MatchesAwait() {
       {/* Filter + Profiles — wrapped for overlay */}
       <div className="relative">
 
-        {/* Overlay when gender not set */}
-        {!user.gender && (
+        {/* Overlay when profile incomplete */}
+        {!hasAccess && (
           <div className="absolute inset-0 z-10 flex items-start justify-center pt-16 pointer-events-none">
             <div className="pointer-events-auto bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl px-10 py-8 text-center max-w-sm mx-4 border border-orange-100">
               <HiOutlineHeart className="w-12 h-12 text-orange-400 mx-auto mb-3" />
               <h3 className="text-xl font-bold text-gray-800 mb-2">Your matches are waiting</h3>
-              <p className="text-gray-500 text-sm mb-5">Complete your profile and set your gender to unlock all matches and filters.</p>
+              <p className="text-gray-500 text-sm mb-2">Complete at least <span className="font-semibold text-orange-500">70%</span> of your profile to unlock all matches and filters.</p>
+              <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+                <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${completionPercent}%` }} />
+              </div>
+              <p className="text-xs text-gray-400 mb-5">{completionPercent}% completed</p>
               <button onClick={() => navigate("/profile")}
                 className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded-xl transition w-full">
                 Complete Profile
@@ -229,11 +274,11 @@ export default function MatchesAwait() {
           </div>
         )}
 
-        {/* Blurred content when no gender */}
-        <div className={!user.gender ? "blur-sm pointer-events-none select-none" : ""}>
+        {/* Blurred content when profile incomplete */}
+        <div className={!hasAccess ? "blur-sm pointer-events-none select-none" : ""}>
 
           {/* Filter Bar */}
-          <div className="bg-white rounded-2xl shadow p-5 mb-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
+          <div className="bg-white rounded-2xl shadow p-5 mb-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 items-end">
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Min Age</label>
               <input type="number" placeholder="18" min="18" max="80" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
@@ -270,6 +315,14 @@ export default function MatchesAwait() {
               <label className="text-xs text-gray-500 mb-1 block">City / Area</label>
               <input type="text" placeholder="e.g. Dhaka" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800"
                 value={filters.city} onChange={(e) => setFilters({ ...filters, city: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Verified</label>
+              <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800" value={filters.verified}
+                onChange={(e) => setFilters({ ...filters, verified: e.target.value })}>
+                <option value="">All</option>
+                <option value="true">Verified Only</option>
+              </select>
             </div>
             <div className="flex gap-2">
               <button onClick={handleApply} className="w-full bg-orange-500 text-white hover:bg-orange-600 text-sm font-semibold px-3 py-2 rounded-xl transition">Filter</button>

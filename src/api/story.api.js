@@ -6,3 +6,4 @@ export const getAdminStories = (status) => axiosInstance.get("/stories/admin", {
 export const adminAddStory = (data) => axiosInstance.post("/stories/admin", data);
 export const updateStoryStatus = (id, status) => axiosInstance.put(`/stories/${id}/status`, { status });
 export const deleteStory = (id) => axiosInstance.delete(`/stories/${id}`);
+export const reorderStories = (orderedIds) => axiosInstance.put("/stories/reorder", { orderedIds });

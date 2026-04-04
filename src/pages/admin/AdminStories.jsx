@@ -1,6 +1,60 @@
 import { useEffect, useState } from "react";
-import { getAdminStories, updateStoryStatus, deleteStory, adminAddStory } from "../../api/story.api";
+import { getAdminStories, updateStoryStatus, deleteStory, adminAddStory, reorderStories } from "../../api/story.api";
 import { uploadToImgBB } from "../../api/imgbb";
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext, verticalListSortingStrategy, useSortable, arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { HiOutlineMenu } from "react-icons/hi";
+
+const SortableStory = ({ s, onStatus, onDelete, filter }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: s._id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex gap-4 items-start">
+      {/* Drag handle — only for approved */}
+      {filter === "approved" && (
+        <button {...attributes} {...listeners}
+          className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 mt-1 flex-shrink-0 touch-none">
+          <HiOutlineMenu className="w-5 h-5" />
+        </button>
+      )}
+      {s.image && <img src={s.image} alt="" className="w-20 h-20 object-cover rounded-xl flex-shrink-0" />}
+      <div className="flex-1">
+        <p className="font-bold text-gray-800">{s.coupleNames}</p>
+        <p className="text-xs text-gray-400 mb-1">{s.location} • by {s.submittedBy?.name}</p>
+        <p className="text-sm text-gray-600 line-clamp-2">"{s.story}"</p>
+      </div>
+      <div className="flex flex-col gap-2 flex-shrink-0">
+        {filter !== "approved" && (
+          <button onClick={() => onStatus(s._id, "approved")}
+            className="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg transition">
+            Approve
+          </button>
+        )}
+        {filter !== "rejected" && (
+          <button onClick={() => onStatus(s._id, "rejected")}
+            className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg transition">
+            Reject
+          </button>
+        )}
+        <button onClick={() => onDelete(s._id)}
+          className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default function AdminStories() {
   const [stories, setStories] = useState([]);
@@ -11,6 +65,9 @@ export default function AdminStories() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const fetchStories = async () => {
     setLoading(true);
@@ -32,8 +89,20 @@ export default function AdminStories() {
     setStories(stories.filter((s) => s._id !== id));
   };
 
-  const handleFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = stories.findIndex((s) => s._id === active.id);
+    const newIndex = stories.findIndex((s) => s._id === over.id);
+    const reordered = arrayMove(stories, oldIndex, newIndex);
+    setStories(reordered);
+    setSaving(true);
+    try {
+      await reorderStories(reordered.map((s) => s._id));
+    } finally { setSaving(false); }
+  };
 
+  const handleFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -58,15 +127,12 @@ export default function AdminStories() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Success Stories</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className={`text-sm font-semibold px-4 py-2 rounded-xl transition ${
-            showForm
-              ? "border border-gray-300 text-gray-600 hover:bg-gray-50"
-              : "bg-orange-500 hover:bg-orange-600 text-white"
-          }`}
-        >
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-gray-800">Success Stories</h2>
+          {saving && <span className="text-xs text-orange-500 animate-pulse">Saving order...</span>}
+        </div>
+        <button onClick={() => setShowForm(!showForm)}
+          className={`text-sm font-semibold px-4 py-2 rounded-xl transition ${showForm ? "border border-gray-300 text-gray-600 hover:bg-gray-50" : "bg-orange-500 hover:bg-orange-600 text-white"}`}>
           {showForm ? "Cancel" : "+ Add Story"}
         </button>
       </div>
@@ -104,49 +170,36 @@ export default function AdminStories() {
       <div className="flex gap-2 mb-6">
         {["pending", "approved", "rejected"].map((s) => (
           <button key={s} onClick={() => setFilter(s)}
-            className={`text-sm font-semibold px-4 py-2 rounded-xl capitalize transition ${
-              filter === s
-                ? "bg-orange-500 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:border-orange-400 hover:text-orange-500"
-            }`}>
+            className={`text-sm font-semibold px-4 py-2 rounded-xl capitalize transition ${filter === s ? "bg-orange-500 text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-orange-400 hover:text-orange-500"}`}>
             {s}
           </button>
         ))}
       </div>
 
+      {filter === "approved" && stories.length > 1 && (
+        <p className="text-xs text-gray-400 mb-4 flex items-center gap-1">
+          <HiOutlineMenu className="w-4 h-4" /> Drag the handle to reorder stories
+        </p>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-10"><span className="loading loading-spinner loading-lg text-orange-500" /></div>
       ) : stories.length === 0 ? (
         <p className="text-center text-gray-400 py-8">No {filter} stories.</p>
+      ) : filter === "approved" ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={stories.map((s) => s._id)} strategy={verticalListSortingStrategy}>
+            <div className="flex flex-col gap-4">
+              {stories.map((s) => (
+                <SortableStory key={s._id} s={s} onStatus={handleStatus} onDelete={handleDelete} filter={filter} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       ) : (
         <div className="flex flex-col gap-4">
           {stories.map((s) => (
-            <div key={s._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex gap-4 items-start">
-              {s.image && <img src={s.image} alt="" className="w-20 h-20 object-cover rounded-xl flex-shrink-0" />}
-              <div className="flex-1">
-                <p className="font-bold text-gray-800">{s.coupleNames}</p>
-                <p className="text-xs text-gray-400 mb-1">{s.location} • by {s.submittedBy?.name}</p>
-                <p className="text-sm text-gray-600 line-clamp-2">"{s.story}"</p>
-              </div>
-              <div className="flex flex-col gap-2 flex-shrink-0">
-                {filter !== "approved" && (
-                  <button onClick={() => handleStatus(s._id, "approved")}
-                    className="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg transition">
-                    Approve
-                  </button>
-                )}
-                {filter !== "rejected" && (
-                  <button onClick={() => handleStatus(s._id, "rejected")}
-                    className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg transition">
-                    Reject
-                  </button>
-                )}
-                <button onClick={() => handleDelete(s._id)}
-                  className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">
-                  Delete
-                </button>
-              </div>
-            </div>
+            <SortableStory key={s._id} s={s} onStatus={handleStatus} onDelete={handleDelete} filter={filter} />
           ))}
         </div>
       )}

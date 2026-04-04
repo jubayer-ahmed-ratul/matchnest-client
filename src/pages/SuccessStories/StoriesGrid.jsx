@@ -52,7 +52,7 @@ const StoriesGrid = () => {
             <img
               src={s.image}
               alt={s.coupleNames}
-              className="w-full h-72 object-cover group-hover:scale-105 transition duration-500"
+              className="w-full h-80 object-cover group-hover:scale-105 transition duration-500"
             />
 
             {/* Overlay */}
@@ -88,7 +88,7 @@ const StoriesGrid = () => {
             <img
               src={selectedStory.image}
               alt={selectedStory.coupleNames}
-              className="w-full h-80 object-cover rounded-xl mb-4"
+              className="w-full h-96 object-cover rounded-xl mb-4"
             />
 
             {/* Content */}

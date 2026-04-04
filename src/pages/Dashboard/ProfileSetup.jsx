@@ -16,6 +16,23 @@ const SectionTitle = ({ title }) => (
   <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-5 mb-3 border-b border-gray-100 pb-2">{title}</h3>
 );
 
+const REQUIRED_FIELDS = [
+  { label: "Name", fn: (f) => f.name },
+  { label: "Gender", fn: (f) => f.gender },
+  { label: "Age", fn: (f) => f.age },
+  { label: "Religion", fn: (f) => f.religion },
+  { label: "Profession", fn: (f) => f.profession },
+  { label: "City", fn: (f) => f.location?.city },
+  { label: "Marital Status", fn: (f) => f.maritalStatus },
+  { label: "Education", fn: (f) => f.education },
+  { label: "Annual Income", fn: (f) => f.career?.annualIncome !== undefined && f.career?.annualIncome !== "" },
+];
+
+const getCompletion = (form) => {
+  const filled = REQUIRED_FIELDS.filter(({ fn }) => fn(form)).length;
+  return Math.round((filled / REQUIRED_FIELDS.length) * 100);
+};
+
 export default function ProfileSetup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -133,15 +150,39 @@ export default function ProfileSetup() {
     } finally { setLoading(false); }
   };
 
+  const completionPercent = getCompletion({ ...form, name: form.name || "filled" }); // name always exists
+
   return (
     <div className="max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-800">My Profile</h2>
         {profileStatus && (
           <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${statusStyle[profileStatus] || "bg-gray-100 text-gray-500"}`}>
             {profileStatus.replace("_", " ")}
           </span>
+        )}
+      </div>
+
+      {/* Completion bar */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4 mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-semibold text-gray-700">Profile Completion</span>
+          <span className={`text-sm font-bold ${completionPercent >= 70 ? "text-green-500" : "text-orange-500"}`}>
+            {completionPercent}%
+          </span>
+        </div>
+        <div className="w-full bg-gray-100 rounded-full h-2.5">
+          <div
+            className={`h-2.5 rounded-full transition-all duration-500 ${completionPercent >= 70 ? "bg-green-500" : "bg-orange-500"}`}
+            style={{ width: `${completionPercent}%` }}
+          />
+        </div>
+        {completionPercent < 70 && (
+          <p className="text-xs text-gray-400 mt-2">Complete at least <span className="text-orange-500 font-semibold">70%</span> to unlock Matches Await. Missing: {REQUIRED_FIELDS.filter(({ fn }) => !fn({ ...form, name: form.name || "filled" })).map(f => f.label).join(", ")}</p>
+        )}
+        {completionPercent >= 70 && (
+          <p className="text-xs text-green-500 mt-2">✓ You have access to Matches Await</p>
         )}
       </div>
 
@@ -261,6 +302,7 @@ export default function ProfileSetup() {
               <input name="career.company" placeholder="Company / Organization" className={inp} value={form.career.company} onChange={handleChange} />
               <select name="career.annualIncome" className={inp} value={form.career.annualIncome} onChange={handleChange}>
                 <option value="">Annual Income</option>
+                <option value="0">No Income (Student / Housewife)</option>
                 <option value="below_3L">Below 3 Lakh</option>
                 <option value="3L_5L">3 - 5 Lakh</option>
                 <option value="5L_10L">5 - 10 Lakh</option>

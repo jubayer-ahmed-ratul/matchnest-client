@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getReceivedInterests, getSentInterests, respondToInterest, cancelInterest } from "../../api/interest.api";
 
 export default function Interests() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState("received");
   const [received, setReceived] = useState([]);
   const [sent, setSent] = useState([]);
@@ -48,7 +50,7 @@ export default function Interests() {
           {received.length === 0 && <p className="text-center text-gray-400 py-8">No interests received.</p>}
           {received.map((i) => (
             <div key={i._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex justify-between items-center">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${i.sender?._id}`)}>
                 <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold overflow-hidden">
                   {i.sender?.profilePhoto?.url
                     ? <img src={i.sender.profilePhoto.url} className="w-full h-full object-cover" alt="" />
@@ -56,7 +58,7 @@ export default function Interests() {
                   }
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">{i.sender?.name}</p>
+                  <p className="font-semibold text-gray-800 hover:text-orange-500 transition">{i.sender?.name}</p>
                   <p className="text-xs text-gray-400">{i.sender?.age} yrs • {i.sender?.religion} • {i.sender?.profession}</p>
                   {i.note && <p className="text-xs text-gray-500 mt-1 italic">"{i.note}"</p>}
                 </div>
@@ -81,7 +83,7 @@ export default function Interests() {
           {sent.length === 0 && <p className="text-center text-gray-400 py-8">No interests sent.</p>}
           {sent.map((i) => (
             <div key={i._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex justify-between items-center">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${i.receiver?._id}`)}>
                 <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold overflow-hidden">
                   {i.receiver?.profilePhoto?.url
                     ? <img src={i.receiver.profilePhoto.url} className="w-full h-full object-cover" alt="" />
@@ -89,7 +91,7 @@ export default function Interests() {
                   }
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">{i.receiver?.name}</p>
+                  <p className="font-semibold text-gray-800 hover:text-orange-500 transition">{i.receiver?.name}</p>
                   <p className="text-xs text-gray-400">{i.receiver?.age} yrs • {i.receiver?.religion} • {i.receiver?.profession}</p>
                 </div>
               </div>
