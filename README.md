@@ -2,6 +2,12 @@
 
 React frontend for the MatchNest matrimony platform.
 
+🌐 **Live Site:** [https://match-nest.netlify.app](https://match-nest.netlify.app)
+
+> For environment variables and API keys, contact the admin:
+> - Email: ahmedjubayer.ratul@gmail.com
+> - Phone: 01863483503
+
 ## Tech Stack
 
 - React 18 + Vite
