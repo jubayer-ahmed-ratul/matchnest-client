@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAdminUsers, verifyUser } from "../../api/admin.api";
 
 export default function AdminPending() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
 
   const fetchPending = async () => {
     setLoading(true);
@@ -41,7 +43,7 @@ export default function AdminPending() {
                   <img src={u.profilePhoto.url} alt={u.name} className="w-12 h-12 rounded-full object-cover border" />
                 )}
                 <div>
-                  <p className="font-semibold">{u.name}</p>
+                  <p className="font-semibold cursor-pointer hover:text-orange-500 transition" onClick={() => navigate(`/profile/${u._id}`)}>{u.name}</p>
                   <p className="text-sm text-gray-400">{u.email}</p>
                   <p className="text-xs text-gray-400 mt-1">{u.age} yrs • {u.gender} • {u.religion} • {u.profession}</p>
                   <p className="text-xs text-gray-400">{u.location?.city}, {u.location?.country}</p>

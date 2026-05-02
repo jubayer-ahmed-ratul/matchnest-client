@@ -25,10 +25,10 @@ const HowWeWork = () => {
         <div className="lg:w-1/2 w-full">
           {/* Header Section */}
           <div className="mb-10">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
               <span className="text-orange-500">How</span> We Work
             </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
               Our simple 4-step process makes finding your perfect match easy and enjoyable. 
               Follow these steps to start your journey towards a meaningful relationship.
             </p>
@@ -52,8 +52,8 @@ const HowWeWork = () => {
 
                 {/* Step content */}
                 <div className="ml-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
+                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">{step.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{step.description}</p>
                 </div>
               </div>
             ))}

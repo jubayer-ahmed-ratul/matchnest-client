@@ -45,14 +45,14 @@ const Stats = () => {
   }, []);
 
   return (
-    <section className="py-10 bg-orange-50" ref={ref}>
+    <section className="py-10 bg-orange-50 dark:bg-gray-800" ref={ref}>
       <div className="w-11/12 mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         {stats.map((s, i) => (
           <div key={i} className="flex flex-col items-center gap-2">
             <p className="text-5xl font-bold text-orange-500">
               <CountUp target={s.target} suffix={s.suffix} start={visible} />
             </p>
-            <p className="text-gray-600 text-lg">{s.label}</p>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">{s.label}</p>
           </div>
         ))}
       </div>

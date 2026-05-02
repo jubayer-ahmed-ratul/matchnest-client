@@ -68,7 +68,7 @@ export default function Dashboard() {
         {plan === "free" && (
           <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center justify-between">
             <span>Upgrade to Premium for unlimited interests & more features.</span>
-            <Link to="/#membership" className="font-semibold underline ml-2">Upgrade</Link>
+            <Link to="/upgrade" className="font-semibold underline ml-2">Upgrade</Link>
           </div>
         )}
       </div>

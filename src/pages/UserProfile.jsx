@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getProfileById } from "../api/search.api";
 import { sendInterest } from "../api/interest.api";
 import { sendChatRequest } from "../api/chat.api";
+import { generateBiodata } from "../utils/generateBiodata";
 import { useAuth } from "../context/AuthContext";
 import {
   HiOutlineCake, HiOutlineUser, HiOutlineLocationMarker,
@@ -41,7 +42,8 @@ export default function UserProfile() {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [chatRequested, setChatRequested] = useState(false);
   const [chatRequestError, setChatRequestError] = useState("");
-
+  const [compatibility, setCompatibility] = useState(null);
+  const [compatLoading, setCompatLoading] = useState(false);
   useEffect(() => {
     getProfileById(id)
       .then((res) => setProfile(res.data.user))
@@ -212,6 +214,39 @@ export default function UserProfile() {
                   <HiOutlineChatAlt2 className="w-4 h-4" /> Send Chat Request
                 </button>
               )}
+            </div>
+          )}
+          {/* AI Biodata PDF card */}
+          {user && user._id?.toString() !== id && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">AI Biodata</h3>
+              <button
+                onClick={async () => {
+                  setCompatLoading(true);
+                  try {
+                    // fetch AI bio first
+                    let aiBio = null;
+                    try {
+                      const { generateBio } = await import("../api/ai.api");
+                      // use profile's own bio or generate a summary
+                      aiBio = profile.bio || null;
+                    } catch { }
+                    await generateBiodata(profile, aiBio);
+                  } catch (err) {
+                    console.error(err);
+                  } finally {
+                    setCompatLoading(false);
+                  }
+                }}
+                disabled={compatLoading}
+                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold py-2 rounded-xl transition flex items-center justify-center gap-2"
+              >
+                {compatLoading ? (
+                  <span className="loading loading-spinner loading-sm" />
+                ) : (
+                  <>Download Biodata PDF</>
+                )}
+              </button>
             </div>
           )}
         </div>

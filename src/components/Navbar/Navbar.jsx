@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import { HiOutlineHome, HiOutlineUser, HiOutlineLogout } from "react-icons/hi";
 
 const Navbar = () => {
@@ -11,6 +12,14 @@ const Navbar = () => {
   const mobileMenuRef = useRef(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+  // ThemeContext only available inside MainLayout — safe fallback
+  let dark = false, toggle = () => {};
+  try {
+    const theme = useTheme();
+    if (theme) { dark = theme.dark; toggle = theme.toggle; }
+  } catch { }
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -119,6 +128,23 @@ const Navbar = () => {
 
         {/* Navbar End */}
         <div className="hidden lg:flex items-center gap-3">
+          {isHomePage && (
+          <button
+            onClick={toggle}
+            className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+            title={dark ? "Light mode" : "Dark mode"}
+          >
+            {dark ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm0 16a1 1 0 011 1v1a1 1 0 01-2 0v-1a1 1 0 011-1zm8-8a1 1 0 010 2h-1a1 1 0 010-2h1zM4 11a1 1 0 010 2H3a1 1 0 010-2h1zm13.657-5.657a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zM7.05 16.95a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zm9.9 0a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zM5.636 6.343a1 1 0 011.414 0l.707.707A1 1 0 016.343 8.464l-.707-.707a1 1 0 010-1.414zM12 7a5 5 0 100 10A5 5 0 0012 7z"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+              </svg>
+            )}
+          </button>
+          )}
           {user ? (
             /* User Avatar Dropdown */
             <div className="relative" ref={dropdownRef}>

@@ -27,29 +27,29 @@ const FAQ = () => {
   const [open, setOpen] = useState(null);
 
   return (
-    <section className="py-10 bg-orange-50">
+    <section className="py-10 bg-orange-50 dark:bg-gray-800">
       <div className="w-11/12 mx-auto">
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+        <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
           Frequently Asked <span className="text-orange-500">Questions</span>
         </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
           Got questions? We've got answers. Here are some of the most common ones.
         </p>
       </div>
 
       <div className="max-w-3xl mx-auto flex flex-col gap-3">
         {faqs.map((faq, i) => (
-          <div key={i} className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+          <div key={i} className="bg-white dark:bg-gray-700 rounded-xl shadow border border-gray-100 dark:border-gray-600 overflow-hidden">
             <button
               onClick={() => setOpen(open === i ? null : i)}
               className="w-full flex items-center justify-between px-6 py-4 text-left"
             >
-              <span className="font-semibold text-gray-800">{faq.q}</span>
+              <span className="font-semibold text-gray-800 dark:text-white">{faq.q}</span>
               <span className={`text-orange-500 text-xl transition-transform duration-300 ${open === i ? "rotate-45" : ""}`}>+</span>
             </button>
             {open === i && (
-              <div className="px-6 pb-4 text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-3">
+              <div className="px-6 pb-4 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-100 dark:border-gray-600 pt-3">
                 {faq.a}
               </div>
             )}

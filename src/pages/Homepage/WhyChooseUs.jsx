@@ -55,10 +55,10 @@ const WhyChooseUs = () => {
 
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+        <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
           <span className="text-orange-500">Why</span> Choose Us
         </h2>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
           We offer the most reliable, trusted, and user-friendly matrimonial experience with unique features designed to make your journey smooth and successful.
         </p>
       </div>
@@ -74,11 +74,11 @@ const WhyChooseUs = () => {
               opacity: visible ? 1 : 0,
               transform: visible ? 'translateX(0)' : `translateX(${item.fromX}px)`,
             }}
-            className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center"
+            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center"
           >
             {item.icon}
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">{item.title}</h3>
-            <p className="text-gray-600">{item.desc}</p>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">{item.title}</h3>
+            <p className="text-gray-600 dark:text-gray-400">{item.desc}</p>
           </div>
         ))}
       </div>

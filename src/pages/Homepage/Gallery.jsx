@@ -8,10 +8,10 @@ const Gallery = () => {
   return (
     <section className="py-10 w-11/12 mx-auto">
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+        <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
           Our <span className="text-orange-500">Gallery</span>
         </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
           Moments of love, joy, and new beginnings from our happy couples.
         </p>
       </div>

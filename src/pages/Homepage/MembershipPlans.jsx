@@ -11,9 +11,9 @@ const plans = [
     price: "Free",
     features: [
       "Create Profile",
-      "Browse Matches",
+      "Browse Limited Profiles",
+      "Send 2 Interests",
       "Basic Filters",
-      "Send Interest (Limited)"
     ],
     highlight: false,
   },
@@ -22,11 +22,13 @@ const plans = [
     name: "Premium",
     price: "$19 / month",
     features: [
-      "Unlimited Profile Views",
-      "Send Unlimited Interests",
+      "Send 5 Interests",
+      "View Verified Profiles",
       "Advanced Filters",
+      "Smart Suggestions",
       "Chat with Matches",
-      "Priority Support"
+      "See Who Viewed You",
+      "Priority Support",
     ],
     highlight: true,
   },
@@ -35,11 +37,12 @@ const plans = [
     name: "Elite",
     price: "$49 / month",
     features: [
+      "Unlimited Interests",
+      "Everything in Premium",
+      "View Contact Info",
+      "Highest Profile Priority",
       "VIP Matchmaking",
-      "Dedicated Relationship Manager",
-      "Verified Match Suggestions",
       "Direct Contact Access",
-      "Highest Profile Priority"
     ],
     highlight: false,
   },
@@ -71,10 +74,10 @@ const MembershipPlans = () => {
   return (
     <section className="py-10 w-11/12 mx-auto">
       <div className="text-center mb-14">
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+        <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
           <span className="text-orange-500">Membership</span> Plans
         </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
           Choose the plan that fits your journey. Upgrade anytime to enjoy more features
           and connect faster.
         </p>
@@ -85,21 +88,21 @@ const MembershipPlans = () => {
         {plans.map((plan, index) => (
           <div
             key={index}
-            className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-2xl 
-              ${plan.highlight ? "border-orange-500 scale-105" : "border-gray-200"}`}
+            className={`rounded-2xl p-6 shadow-lg border transition-all duration-300 hover:shadow-2xl flex flex-col dark:bg-gray-800
+              ${plan.highlight ? "border-orange-500 scale-105" : "border-gray-200 dark:border-gray-700"}`}
           >
-            <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">
               {plan.name}
             </h3>
 
-            <p className="text-center text-orange-500 text-3xl font-bold mb-6">
+            <p className="text-center text-orange-500 text-2xl font-bold mb-5">
               {plan.price}
             </p>
 
-            <div className="space-y-3 mb-6">
+            <div className="space-y-3 mb-5 flex-1">
               {plan.features.map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-gray-700">
-                  <FiCheck className="text-orange-500 text-xl" />
+                <div key={i} className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
+                  <FiCheck className="text-orange-500 flex-shrink-0" />
                   <span>{feature}</span>
                 </div>
               ))}
@@ -108,10 +111,10 @@ const MembershipPlans = () => {
             <button
               onClick={() => handlePlan(plan.key)}
               disabled={loading === plan.key}
-              className={`w-full py-3 rounded-lg font-semibold transition-all flex items-center justify-center
+              className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all flex items-center justify-center mt-auto
                 ${plan.highlight
                   ? "bg-orange-500 text-white hover:bg-orange-600"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
                 }`}
             >
               {loading === plan.key ? <span className="loading loading-spinner loading-sm" /> : plan.key === "free" ? "Get Started" : "Choose Plan"}

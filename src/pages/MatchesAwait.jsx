@@ -155,7 +155,8 @@ export default function MatchesAwait() {
   }, [user]);
 
   const completionPercent = getCompletionPercent(profileData);
-  const hasAccess = completionPercent >= 70;
+  const isAdmin = user?.role === "admin";
+  const hasAccess = isAdmin || completionPercent >= 70;
 
   const handleViewProfile = (id) => {
     if (user?.profileStatus === "verified") {

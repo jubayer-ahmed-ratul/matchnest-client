@@ -24,6 +24,7 @@ import Search from "./pages/Dashboard/Search";
 import Interests from "./pages/Dashboard/Interests";
 import Messages from "./pages/Dashboard/Messages";
 import SubmitStory from "./pages/Dashboard/SubmitStory";
+import Upgrade from "./pages/Dashboard/Upgrade";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPending from "./pages/admin/AdminPending";
@@ -88,6 +89,7 @@ function AppContent() {
         <Route path="/interests" element={<PrivateRoute><DashboardLayout><Interests /></DashboardLayout></PrivateRoute>} />
         <Route path="/messages" element={<PrivateRoute><DashboardLayout><Messages /></DashboardLayout></PrivateRoute>} />
         <Route path="/submit-story" element={<PrivateRoute><DashboardLayout><SubmitStory /></DashboardLayout></PrivateRoute>} />
+        <Route path="/upgrade" element={<PrivateRoute><DashboardLayout><Upgrade /></DashboardLayout></PrivateRoute>} />
         <Route path="/admin" element={<AdminRoute><AdminLayout><AdminOverview /></AdminLayout></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
         <Route path="/admin/pending" element={<AdminRoute><AdminLayout><AdminPending /></AdminLayout></AdminRoute>} />

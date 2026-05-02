@@ -3,6 +3,7 @@ import { updateProfile, updateProfilePhoto, getProfile, addPhoto, removePhoto } 
 import { uploadToImgBB } from "../../api/imgbb";
 import { useNavigate } from "react-router-dom";
 import { HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
+import { generateBio } from "../../api/ai.api";
 
 const statusStyle = {
   incomplete: "bg-yellow-100 text-yellow-600",
@@ -54,6 +55,19 @@ export default function ProfileSetup() {
   const [profileStatus, setProfileStatus] = useState("");
   const [photos, setPhotos] = useState([]);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [generatingBio, setGeneratingBio] = useState(false);
+
+  const handleGenerateBio = async () => {
+    setGeneratingBio(true);
+    try {
+      const res = await generateBio();
+      setForm((f) => ({ ...f, bio: res.data.bio }));
+    } catch {
+      setError("Failed to generate bio. Try again.");
+    } finally {
+      setGeneratingBio(false);
+    }
+  };
 
   useEffect(() => {
     getProfile().then((res) => {
@@ -290,6 +304,21 @@ export default function ProfileSetup() {
 
             {/* About Me */}
             <SectionTitle title="About Me" />
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-gray-400">Write your bio or let AI generate one</span>
+              <button
+                type="button"
+                onClick={handleGenerateBio}
+                disabled={generatingBio}
+                className="flex items-center gap-1.5 text-xs bg-orange-50 hover:bg-orange-100 text-orange-500 font-semibold px-3 py-1.5 rounded-lg transition border border-orange-200"
+              >
+                {generatingBio ? (
+                  <span className="loading loading-spinner loading-xs" />
+                ) : (
+                  "✨ Generate with AI"
+                )}
+              </button>
+            </div>
             <textarea name="bio" placeholder="Bio (max 500 chars)" className={`${inp} resize-none`} rows={4} value={form.bio} onChange={handleChange} maxLength={500} />
           </div>
 

@@ -12,9 +12,8 @@ import Stats from './Stats';
 
 const Home = () => {
     return (
-        <div>
+        <div className="dark:bg-gray-900 transition-colors duration-300">
             <Banner></Banner>
-            
             <WhoWeAre></WhoWeAre>
             <Stats />
             <HowWeWork></HowWeWork>
@@ -22,7 +21,6 @@ const Home = () => {
             <MembershipPlans></MembershipPlans>
           <Gallery />
           <FAQ />
-          
         </div>
     );
 };

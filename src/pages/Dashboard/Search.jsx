@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { searchProfiles, getSuggestions } from "../../api/search.api";
 import { sendInterest } from "../../api/interest.api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { HiOutlineLocationMarker, HiOutlineBriefcase, HiOutlineSearch, HiOutlineSparkles } from "react-icons/hi";
 
 const inputClass = "border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800";
@@ -52,6 +53,8 @@ const ProfileCard = ({ p, onInterest, sentIds, navigate }) => (
 
 export default function Search() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isFree = (user?.membershipPlan || "free") === "free";
   const [tab, setTab] = useState("suggestions");
   const [profiles, setProfiles] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -119,7 +122,17 @@ export default function Search() {
       {/* Suggestions Tab */}
       {tab === "suggestions" && (
         <>
-          {loading ? (
+          {isFree ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <HiOutlineSparkles className="w-14 h-14 text-orange-200 mb-4" />
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Suggestions</h3>
+              <p className="text-gray-500 text-sm mb-6 max-w-sm">Upgrade to Premium or Elite to get personalized match suggestions based on your religion, education, lifestyle and more.</p>
+              <button onClick={() => navigate("/upgrade")}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded-xl transition">
+                Upgrade Plan
+              </button>
+            </div>
+          ) : loading ? (
             <div className="flex justify-center py-10"><span className="loading loading-spinner loading-lg text-orange-500" /></div>
           ) : suggestions.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
