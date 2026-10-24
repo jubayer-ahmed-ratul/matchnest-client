@@ -1,22 +1,69 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getApprovedStories } from "../../api/story.api";
+
+const SkeletonCard = () => (
+  <div className="rounded-2xl overflow-hidden shadow-lg animate-pulse">
+    <div className="w-full h-80 bg-gray-200 dark:bg-gray-700" />
+    <div className="p-4 space-y-2">
+      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+    </div>
+  </div>
+);
 
 const StoriesGrid = () => {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedStory, setSelectedStory] = useState(null);
 
-  useEffect(() => {
-    getApprovedStories()
-      .then((res) => setStories(res.data.stories))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+  const fetchStories = useCallback(async (retries = 2) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getApprovedStories();
+      setStories(res.data.stories);
+    } catch (err) {
+      if (retries > 0) {
+        // Retry after a short delay (handles Vercel cold-start timeouts)
+        await new Promise((r) => setTimeout(r, 1500));
+        return fetchStories(retries - 1);
+      }
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStories();
+  }, [fetchStories]);
 
   if (loading)
     return (
-      <div className="flex justify-center py-16">
-        <span className="loading loading-spinner loading-lg text-orange-500" />
+      <section className="pb-16 w-11/12 mx-auto">
+        <div className="text-center mb-12">
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-80 mx-auto mb-4 animate-pulse" />
+          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-96 mx-auto animate-pulse" />
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </section>
+    );
+
+  if (error)
+    return (
+      <div className="text-center py-16">
+        <p className="text-red-500 text-lg mb-4">{error}</p>
+        <button
+          onClick={() => fetchStories()}
+          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-xl transition"
+        >
+          Try Again
+        </button>
       </div>
     );
 
